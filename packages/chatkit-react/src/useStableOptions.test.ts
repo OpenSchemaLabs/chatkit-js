@@ -227,3 +227,14 @@ describe('withLatestFunctionWrappers', () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 });
+  it('handles cyclic references in options gracefully', () => {
+    const a: Record<string, unknown> = { x: 1 };
+    a.self = a;
+
+    const ref = latestRef(a);
+    const wrapped = withLatestFunctionWrappers(ref);
+
+    expect(wrapped.x).toBe(1);
+    expect(wrapped.self).toBe(wrapped);
+    expect(wrapped).not.toBe(a);
+  });
