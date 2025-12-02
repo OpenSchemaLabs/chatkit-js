@@ -5,6 +5,7 @@ import type {
   ChatKitOptions,
   ChatKitEvents,
 } from '@openai/chatkit';
+import { createOpenAIAdapter } from './utils/openai-adapter';
 
 type DotToCamelCase<S extends string> = S extends `${infer Head}.${infer Tail}`
   ? `${Head}${Capitalize<DotToCamelCase<Tail>>}`
@@ -90,6 +91,11 @@ export function useChatKit(options: UseChatKitOptions): UseChatKitReturn {
         // @ts-expect-error - too dynamic for TypeScript
         options[key] = value;
       }
+    }
+
+    // Apply OpenAI adapter if detected
+    if ('apiKey' in options.api && options.api.apiKey) {
+      options.api = createOpenAIAdapter(options.api);
     }
 
     return {

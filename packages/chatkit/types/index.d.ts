@@ -6,7 +6,7 @@ export type ChatKitOptions = {
   /**
    * Configuration for how ChatKit communicates with your backend.
    */
-  api: CustomApiConfig | HostedApiConfig;
+  api: CustomApiConfig | HostedApiConfig | OpenAIApiConfig;
 
   /**
    * Locale override for ChatKit UI. If not provided, the browser's locale
@@ -594,6 +594,30 @@ export type HostedApiConfig = {
    * Function to get a client token or refresh if the current token is expired.
    */
   getClientSecret: (currentClientSecret: string | null) => Promise<string>;
+};
+
+export type OpenAIApiConfig = {
+  /**
+   * The OpenAI API key to use.
+   */
+  apiKey: string;
+
+  /**
+   * The endpoint to use for the OpenAI API.
+   * @default "https://api.openai.com/v1/chat/completions"
+   */
+  endpoint?: string;
+
+  /**
+   * The model to use for the OpenAI API.
+   */
+  model?: string;
+
+  /**
+   * Whether to allow passing the API key in the browser.
+   * This is generally not recommended for production apps as it exposes your API key.
+   */
+  dangerouslyAllowBrowserKey?: boolean;
 };
 
 /** The color scheme to use for the ChatKit UI. */

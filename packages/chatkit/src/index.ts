@@ -257,7 +257,7 @@ export type ChatKitTheme = {
   };
 };
 
-type CustomApiConfig = {
+export type CustomApiConfig = {
   /**
    * The URL (relative or absolute) of the ChatKit API. The configured endpoint
    * must conform to the specification defined in the ChatKit SDK documentation.
@@ -285,15 +285,39 @@ type CustomApiConfig = {
   uploadStrategy?: FileUploadStrategy;
 };
 
-type HostedApiConfig = {
+export type HostedApiConfig = {
   /**
    * Function to get a client token or refresh if the current token is expired.
    */
   getClientSecret: (currentClientSecret: string | null) => Promise<string>;
 };
 
+export type OpenAIApiConfig = {
+  /**
+   * The OpenAI API key to use.
+   */
+  apiKey: string;
+
+  /**
+   * The endpoint to use for the OpenAI API.
+   * @default "https://api.openai.com/v1/chat/completions"
+   */
+  endpoint?: string;
+
+  /**
+   * The model to use for the OpenAI API.
+   */
+  model?: string;
+
+  /**
+   * Whether to allow passing the API key in the browser.
+   * This is generally not recommended for production apps as it exposes your API key.
+   */
+  dangerouslyAllowBrowserKey?: boolean;
+};
+
 export type ChatKitOptions = {
-  api: CustomApiConfig | HostedApiConfig;
+  api: CustomApiConfig | HostedApiConfig | OpenAIApiConfig;
 
   /**
    * Locale override for ChatKit UI. If not provided, the browser's locale
@@ -624,7 +648,14 @@ export interface ChatKitElementEventMap {
   'chatkit.response.start': CustomEvent<void>;
   'chatkit.response.end': CustomEvent<void>;
   'chatkit.thread.change': CustomEvent<{ threadId: string | null }>;
+  'chatkit.thread.load.start': CustomEvent<{ threadId: string }>;
+  'chatkit.thread.load.end': CustomEvent<{ threadId: string }>;
   'chatkit.log': CustomEvent<{
+    name: string;
+    data?: Record<string, unknown>;
+  }>;
+  'chatkit.ready': CustomEvent<void>;
+  'chatkit.effect': CustomEvent<{
     name: string;
     data?: Record<string, unknown>;
   }>;
