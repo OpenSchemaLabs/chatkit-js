@@ -64,6 +64,7 @@ export function withLatestFunctionWrappers<T extends Record<string, any>>(ref: {
   current: T;
 }): T {
   const path: (string | number)[] = [];
+  const visited = new WeakMap<object, any>();
 
   const getByPath = (root: any, p: (string | number)[]) =>
     p.reduce((acc, k) => (acc == null ? acc : acc[k]), root);
@@ -79,6 +80,10 @@ export function withLatestFunctionWrappers<T extends Record<string, any>>(ref: {
   };
 
   const visit = (v: any): any => {
+    if (v && typeof v === 'object' && visited.has(v)) {
+      return visited.get(v);
+    }
+
     if (typeof v === 'function') {
       const key = path[path.length - 1];
       const parentPath = path.slice(0, -1);
@@ -87,6 +92,7 @@ export function withLatestFunctionWrappers<T extends Record<string, any>>(ref: {
     if (Array.isArray(v)) {
       const base = path.length;
       const out = new Array(v.length);
+      visited.set(v, out);
       for (let i = 0; i < v.length; i++) {
         path[base] = i;
         out[i] = visit(v[i]);
@@ -97,6 +103,7 @@ export function withLatestFunctionWrappers<T extends Record<string, any>>(ref: {
     if (v && typeof v === 'object') {
       const base = path.length;
       const out: Record<string, any> = {};
+      visited.set(v, out);
       for (const k of Object.keys(v)) {
         path[base] = k;
         out[k] = visit(v[k]);
